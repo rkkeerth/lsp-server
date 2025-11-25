@@ -1,0 +1,46 @@
+{
+  "name": "basic-lsp-client",
+  "displayName": "Basic LSP Client",
+  "description": "Example VS Code client for the basic LSP server",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": ["Programming Languages"],
+  "activationEvents": ["onLanguage:plaintext"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Basic LSP Server",
+      "properties": {
+        "basicLspServer.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "verbose",
+          "description": "Traces the communication between VS Code and the language server."
+        },
+        "basicLspServer.serverPath": {
+          "scope": "window",
+          "type": "string",
+          "default": "lsp-server",
+          "description": "Path to the LSP server executable."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.0"
+  }
+}
