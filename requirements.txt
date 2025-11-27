@@ -1,0 +1,2 @@
+# No external dependencies required
+# This LSP server is implemented using only Python standard library

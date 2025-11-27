@@ -1,0 +1,26 @@
+This is a sample document to test the LSP server.
+
+The server will analyze this document and provide diagnostics.
+
+TODO: Add more content to this example file
+This line is short and fine.
+
+FIXME: This needs to be fixed urgently!
+
+This is a very long line that exceeds the 120 character limit and should trigger a warning from the LSP server about line length issues.
+
+Here is some normal text.
+Here is some normal text.
+
+The duplicate lines above should be detected.
+
+TODO: Another task to complete
+FIXME: Critical bug that needs attention
+
+This document demonstrates various diagnostic rules:
+- TODO detection
+- FIXME detection  
+- Long line detection
+- Duplicate line detection
+
+End of test document.
