@@ -1,0 +1,46 @@
+{
+  "name": "basic-lsp-client",
+  "displayName": "Basic LSP Client",
+  "description": "Example VS Code extension for the basic LSP server",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:plaintext",
+    "onLanguage:text"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Basic LSP Server",
+      "properties": {
+        "basicLspServer.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the LSP server executable"
+        },
+        "basicLspServer.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0"
+  }
+}
