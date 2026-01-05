@@ -1,0 +1,12 @@
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.log
+lsp-server
+lsp-server.exe
+*.test
+coverage.out
+.project_verification.txt
