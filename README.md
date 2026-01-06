@@ -1,188 +1,201 @@
-# LSP Server
+# Basic LSP Server
 
-A comprehensive Language Server Protocol (LSP) server implementation in Go that provides intelligent language features for code editors and IDEs. This server implements the LSP specification to enable features like code completion, hover information, go-to-definition, find references, and more.
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![LSP Version](https://img.shields.io/badge/LSP-3.17-green.svg)](https://microsoft.github.io/language-server-protocol/)
+[![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](requirements.txt)
 
-## What is an LSP Server?
+A lightweight, educational Language Server Protocol (LSP) implementation in Python. Built entirely with Python's standard library to demonstrate LSP fundamentals without external dependencies.
 
-The Language Server Protocol (LSP) is an open, JSON-RPC-based protocol created by Microsoft that standardizes the communication between development tools and language servers. It allows editors and IDEs to provide intelligent language features without having to implement language-specific logic for each tool.
+## 🎯 Project Purpose
 
-Key benefits of LSP:
-- **Write Once, Use Everywhere**: A single language server can be used across multiple editors
-- **Rich Language Features**: Provides code completion, diagnostics, refactoring, and navigation
-- **Separation of Concerns**: Language intelligence is decoupled from the editor
-- **Protocol Standardization**: Well-defined communication protocol between client and server
+This project serves as:
 
-## Features
+- **Learning Resource**: Understand LSP protocol internals by reading clean, well-documented code
+- **Reference Implementation**: See how JSON-RPC 2.0 message handling works in practice
+- **Starter Template**: Fork and extend to create custom language servers for your own needs
+- **Proof of Concept**: Demonstrate that LSP servers don't require heavy frameworks
 
-This LSP server implementation provides a complete set of language intelligence features:
+Perfect for developers who want to understand how language servers work under the hood or need a minimal foundation to build upon.
 
-### 🔄 Lifecycle Management
-- **Initialize**: Negotiates capabilities between client and server
-- **Initialized**: Confirms successful initialization
-- **Shutdown**: Gracefully shuts down the server
-- **Exit**: Terminates the server process
+## ✨ Features
 
-### 📄 Text Document Synchronization
-- **didOpen**: Tracks when documents are opened in the editor
-- **didChange**: Updates document content as you type (full document synchronization)
-- **didClose**: Removes documents from tracking when closed
-- **didSave**: Handles document save events
+### Core LSP Capabilities
 
-### 🚀 Language Intelligence Features
-- **Hover**: Displays detailed information about symbols under the cursor
-- **Go to Definition**: Navigates directly to symbol definitions
-- **Find References**: Locates all usages of a symbol across the workspace
-- **Document Symbols**: Provides document outline for quick navigation
-- **Workspace Symbols**: Searches for symbols across the entire workspace
-- **Code Completion**: Offers intelligent code suggestions including keywords and symbols
-- **Diagnostics**: Reports errors, warnings, and hints (including TODO/FIXME detection)
+- **🔄 Lifecycle Management**: Full initialize/shutdown protocol compliance
+  - Capability negotiation with clients
+  - Graceful server shutdown
+  - Proper state management
 
-### 🔒 Robustness
-- Thread-safe document management with concurrent access support
-- Comprehensive error handling and recovery
-- Structured logging for debugging and monitoring
-- JSON-RPC 2.0 compliant message handling
+- **📄 Text Document Synchronization**: Real-time document tracking
+  - `textDocument/didOpen` - Track newly opened documents
+  - `textDocument/didChange` - Sync content changes (full document mode)
+  - `textDocument/didClose` - Clean up closed documents
 
-## Installation
+- **🔍 Diagnostic Analysis**: Intelligent code quality checks
+  - `TODO` markers → Informational hints
+  - `FIXME` markers → Warning alerts
+  - Lines exceeding 120 characters → Style warnings
+  - Duplicate consecutive lines → Code smell detection
 
-### Prerequisites
+- **📡 JSON-RPC 2.0 Protocol**: Standards-compliant message handling
+  - Request/response correlation with message IDs
+  - Notification support (fire-and-forget)
+  - Proper error handling and reporting
+  - Content-Length based message framing
 
-- **Go 1.21 or higher**: [Download Go](https://golang.org/dl/)
-- **Git**: For cloning the repository
+## 📋 Requirements
 
-### Building from Source
+**Minimum Requirements:**
+- Python 3.8 or higher
+- Standard library only (no pip packages needed!)
+- Any OS: Linux, macOS, Windows
 
+**For Editor Integration:**
+- An LSP-compatible editor (VS Code, Neovim, Emacs, Sublime Text, Vim, etc.)
+- Optional: Terminal for testing with the included test client
+
+## 🚀 Quick Start
+
+### Installation
+
+**Option 1: Clone the Repository**
 ```bash
-# Clone the repository
 git clone https://github.com/rkkeerth/lsp-server.git
 cd lsp-server
-
-# Download dependencies
-go mod download
-
-# Build the server binary
-go build -o lsp-server .
-
-# (Optional) Install globally
-go install .
 ```
 
-### Verify Installation
+**Option 2: Direct Download**
+```bash
+# Download just the server file
+curl -O https://raw.githubusercontent.com/rkkeerth/lsp-server/main/server.py
+chmod +x server.py
+```
+
+No pip install needed! The server is ready to run immediately:
 
 ```bash
-# Check that the binary was created
-./lsp-server --version
-
-# Or if installed globally
-lsp-server --version
+python3 server.py
 ```
 
-## Usage
+### 5-Minute Test Drive
 
-### Running the Server
-
-The LSP server communicates via stdin/stdout, which is the standard for LSP implementations:
+Verify everything works in seconds:
 
 ```bash
-# Start the server (it will wait for LSP messages on stdin)
-./lsp-server
-
-# Redirect logs to a file for debugging
-./lsp-server 2> lsp-server.log
+# Run the included test client with example file
+python3 test_client.py examples/test.txt
 ```
 
-The server uses:
-- **stdin**: Receives LSP requests from the client
-- **stdout**: Sends LSP responses to the client
-- **stderr**: Outputs diagnostic and debug logs
+Expected output:
+```
+============================================================
+Diagnostics received for: file:///path/to/test.txt
+============================================================
+Found 7 issue(s):
 
-### Integration with Code Editors
+  [INFO] Line 5, Col 1: TODO found: Consider addressing this item
+  [WARNING] Line 8, Col 1: FIXME found: This requires immediate attention
+  [WARNING] Line 10, Col 121: Line too long (145 > 120 characters)
+  ...
+============================================================
+```
+
+✅ Success! Your LSP server is working correctly.
+
+## 📖 Usage
+
+### Running the Server Standalone
+
+The LSP server communicates via standard input/output (stdin/stdout):
+
+```bash
+python3 server.py
+```
+
+The server will:
+1. Start listening on stdin for JSON-RPC messages
+2. Log activity to `/tmp/lsp-server.log`
+3. Send responses to stdout
+4. Run until receiving a shutdown request
+
+### Testing with the Included Client
+
+A full-featured test client demonstrates all server capabilities:
+
+```bash
+# Test with the example file
+python3 test_client.py examples/test.txt
+
+# Test with your own file
+python3 test_client.py /path/to/your/file.txt
+
+# Use the automated test script
+./run_test.sh
+```
+
+The test client will:
+1. ✅ Start the LSP server as a subprocess
+2. ✅ Initialize the client-server connection
+3. ✅ Open the specified document
+4. ✅ Display diagnostics with severity levels and line numbers
+5. ✅ Properly shut down the server
+
+### Editor Integration
 
 #### Visual Studio Code
 
-Create a custom VS Code extension or configure an existing LSP client extension:
+**Method 1: Using a Generic LSP Extension**
 
-**Option 1: Using a generic LSP client extension**
-
-1. Install the "Generic LSP Client" extension
-2. Configure in `.vscode/settings.json`:
+Install an extension like ["Generic LSP Client"](https://marketplace.visualstudio.com/items?itemName=GregorBiswanger.genericlsp) and configure:
 
 ```json
 {
-  "genericLSPClient.languageServerConfigs": {
-    "mylanguage": {
-      "command": "/path/to/lsp-server",
-      "languageIds": ["mylanguage"]
+  "genericlsp.languageServers": [
+    {
+      "command": "python3",
+      "args": ["/absolute/path/to/lsp-server/server.py"],
+      "filetypes": ["txt", "text"],
+      "name": "basic-lsp-server"
     }
-  }
+  ]
 }
 ```
 
-**Option 2: Create a custom extension**
+**Method 2: Create Custom Extension**
 
-In your extension's `extension.ts`:
+1. Use the [VS Code Extension Generator](https://code.visualstudio.com/api/get-started/your-first-extension)
+2. Add LSP client dependency
+3. Configure server command in extension code
 
-```typescript
-import * as vscode from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
+#### Neovim (Native LSP)
 
-let client: LanguageClient;
-
-export function activate(context: vscode.ExtensionContext) {
-  const serverOptions: ServerOptions = {
-    command: '/path/to/lsp-server',
-    args: []
-  };
-
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'mylanguage' }],
-  };
-
-  client = new LanguageClient('lspServer', 'LSP Server', serverOptions, clientOptions);
-  client.start();
-}
-
-export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
-  }
-  return client.stop();
-}
-```
-
-#### Neovim
-
-Add to your Neovim configuration (Lua):
+Add to your `init.lua`:
 
 ```lua
-local lspconfig = require('lspconfig')
-local configs = require('lspconfig.configs')
-
--- Define the custom LSP server
-if not configs.lsp_server then
-  configs.lsp_server = {
-    default_config = {
-      cmd = {'/path/to/lsp-server'},
-      filetypes = {'mylanguage'},
-      root_dir = lspconfig.util.root_pattern('.git', 'go.mod'),
+-- Configure basic LSP server
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {"text", "txt"},
+  callback = function()
+    vim.lsp.start({
+      name = 'basic-lsp-server',
+      cmd = {'python3', '/absolute/path/to/lsp-server/server.py'},
+      root_dir = vim.fs.dirname(vim.fs.find({'*.txt'}, { upward = true })[1]),
       settings = {},
-    },
-  }
-end
+    })
+  end,
+})
+```
 
--- Start the LSP server
-lspconfig.lsp_server.setup{
-  on_attach = function(client, bufnr)
-    -- Enable completion
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    
-    -- Key mappings
-    local opts = { noremap=true, silent=true, buffer=bufnr }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-  end
-}
+Or in `init.vim`:
+
+```vim
+lua << EOF
+vim.lsp.start({
+  name = 'basic-lsp-server',
+  cmd = {'python3', '/absolute/path/to/lsp-server/server.py'},
+  root_dir = vim.fn.getcwd(),
+})
+EOF
 ```
 
 #### Emacs (lsp-mode)
@@ -190,543 +203,871 @@ lspconfig.lsp_server.setup{
 Add to your Emacs configuration:
 
 ```elisp
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(mylanguage-mode . "mylanguage"))
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection "/path/to/lsp-server")
-    :major-modes '(mylanguage-mode)
-    :server-id 'lsp-server)))
+(require 'lsp-mode)
 
-(add-hook 'mylanguage-mode-hook #'lsp)
+(lsp-register-client
+ (make-lsp-client 
+   :new-connection (lsp-stdio-connection 
+                     '("python3" "/absolute/path/to/lsp-server/server.py"))
+   :major-modes '(text-mode)
+   :server-id 'basic-lsp-server
+   :priority -1))
+
+(add-hook 'text-mode-hook #'lsp)
 ```
 
-#### Sublime Text
+#### Sublime Text (LSP Package)
 
-Install the LSP package and add to `LSP.sublime-settings`:
+1. Install the [LSP package](https://packagecontrol.io/packages/LSP)
+2. Add to LSP settings (`Preferences > Package Settings > LSP > Settings`):
 
 ```json
 {
   "clients": {
-    "lsp-server": {
+    "basic-lsp-server": {
       "enabled": true,
-      "command": ["/path/to/lsp-server"],
-      "selector": "source.mylanguage"
+      "command": ["python3", "/absolute/path/to/lsp-server/server.py"],
+      "selector": "text.plain"
     }
   }
 }
 ```
 
-## Getting Started
+#### Vim (with vim-lsp)
 
-### Quick Start Guide
+```vim
+if executable('python3')
+  au User lsp_setup call lsp#register_server({
+    \ 'name': 'basic-lsp-server',
+    \ 'cmd': {server_info->['python3', '/absolute/path/to/lsp-server/server.py']},
+    \ 'allowlist': ['text'],
+    \ })
+endif
+```
 
-1. **Build the server**: `go build -o lsp-server .`
-2. **Configure your editor**: Use the integration examples above
-3. **Open a file**: The server will initialize when you open a supported file
-4. **Use features**: Try hovering over code, using auto-completion, or navigating to definitions
+## 🏗️ Architecture & Technical Details
 
-### Example LSP Communication
+### High-Level Architecture
 
-Here's how the LSP protocol works with example messages:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     LSP Client (Editor)                     │
+│  (VS Code, Neovim, Emacs, Sublime Text, etc.)              │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         │ JSON-RPC 2.0 over stdin/stdout
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                    LSPServer (server.py)                    │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │  Message Handler                                    │    │
+│  │  • Request routing (initialize, shutdown)          │    │
+│  │  • Notification routing (didOpen, didChange, etc.) │    │
+│  │  • Response generation                             │    │
+│  └────────────────────────────────────────────────────┘    │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │  Document Manager                                   │    │
+│  │  • In-memory document storage                      │    │
+│  │  • Content synchronization                         │    │
+│  └────────────────────────────────────────────────────┘    │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │  Analysis Engine                                    │    │
+│  │  • Pattern matching (TODO, FIXME)                  │    │
+│  │  • Style checking (line length)                    │    │
+│  │  • Code smell detection (duplicates)               │    │
+│  └────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
 
-#### 1. Initialize Request (Client → Server)
+### JSON-RPC 2.0 Communication Protocol
 
+Messages are exchanged using the Language Server Protocol format:
+
+**Message Structure:**
+```
+Content-Length: 123\r\n
+\r\n
+{JSON-RPC message}
+```
+
+**Request Example:**
 ```json
 {
   "jsonrpc": "2.0",
   "id": 1,
   "method": "initialize",
   "params": {
-    "processId": 12345,
-    "rootUri": "file:///home/user/project",
-    "capabilities": {
-      "textDocument": {
-        "hover": {
-          "contentFormat": ["markdown", "plaintext"]
-        },
-        "completion": {
-          "completionItem": {
-            "snippetSupport": true
-          }
-        }
-      }
-    }
+    "processId": null,
+    "rootUri": "file:///path/to/workspace",
+    "capabilities": {}
   }
 }
 ```
 
-#### 2. Initialize Response (Server → Client)
-
+**Response Example:**
 ```json
 {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
     "capabilities": {
-      "textDocumentSync": {
-        "openClose": true,
-        "change": 1
-      },
-      "hoverProvider": true,
-      "definitionProvider": true,
-      "referencesProvider": true,
-      "documentSymbolProvider": true,
-      "workspaceSymbolProvider": true,
-      "completionProvider": {
-        "triggerCharacters": [".", ":", ">"]
-      },
-      "diagnosticProvider": true
-    },
-    "serverInfo": {
-      "name": "lsp-server",
-      "version": "1.0.0"
+      "textDocumentSync": 1,
+      "diagnosticProvider": {}
     }
   }
 }
 ```
 
-#### 3. Document Open Notification (Client → Server)
-
+**Notification Example:**
 ```json
 {
   "jsonrpc": "2.0",
   "method": "textDocument/didOpen",
   "params": {
     "textDocument": {
-      "uri": "file:///home/user/project/main.go",
-      "languageId": "go",
+      "uri": "file:///path/to/file.txt",
+      "languageId": "plaintext",
       "version": 1,
-      "text": "package main\n\nfunc main() {\n\tprintln(\"Hello, World!\")\n}"
+      "text": "file contents..."
     }
   }
 }
 ```
 
-#### 4. Hover Request (Client → Server)
+### Message Flow Sequence
+
+```
+Client                                    Server
+  │                                         │
+  ├─────── initialize (request) ──────────>│
+  │                                         │ (negotiate capabilities)
+  │<────── initialize response ─────────────┤
+  │                                         │
+  ├─────── initialized (notification) ─────>│
+  │                                         │
+  ├─────── textDocument/didOpen ───────────>│
+  │                                         │ (analyze document)
+  │<────── publishDiagnostics ──────────────┤
+  │                                         │
+  ├─────── textDocument/didChange ─────────>│
+  │                                         │ (re-analyze document)
+  │<────── publishDiagnostics ──────────────┤
+  │                                         │
+  ├─────── shutdown (request) ─────────────>│
+  │                                         │
+  │<────── shutdown response ────────────────┤
+  │                                         │
+  ├─────── exit (notification) ─────────────>│
+  │                                         │ (terminate)
+```
+
+### Core Components
+
+#### 1. **LSPServer Class** (`server.py`)
+
+Main server implementation with the following responsibilities:
+
+- **Message I/O**: Read/write JSON-RPC messages via stdin/stdout
+- **Request Handling**: Process requests that expect responses
+- **Notification Handling**: Process fire-and-forget notifications
+- **Document Lifecycle**: Track open documents and their content
+- **Diagnostic Publishing**: Push analysis results to clients
+
+**Key Methods:**
+```python
+def handle_initialize(params)       # Capability negotiation
+def handle_shutdown(params)         # Prepare for termination
+def handle_text_document_did_open(params)   # Document opened
+def handle_text_document_did_change(params) # Document edited
+def handle_text_document_did_close(params)  # Document closed
+def analyze_document(text)          # Core analysis logic
+def publish_diagnostics(uri, diags) # Send results to client
+```
+
+#### 2. **Analysis Engine**
+
+The `analyze_document()` method scans text for issues using:
+
+- **Regular expressions**: Pattern matching for TODO/FIXME
+- **String operations**: Length checking, line comparison
+- **Position tracking**: LSP-compatible line/character positions
+
+**Diagnostic Structure:**
+```python
+{
+  "range": {
+    "start": {"line": 5, "character": 0},  # 0-indexed
+    "end": {"line": 5, "character": 4}
+  },
+  "message": "TODO found: Consider addressing this item",
+  "severity": 3,  # 1=Error, 2=Warning, 3=Info, 4=Hint
+  "source": "basic-lsp-server"
+}
+```
+
+#### 3. **Document State Management**
+
+Documents are stored in memory with URI-to-content mapping:
+
+```python
+self.documents: Dict[str, str] = {
+  "file:///path/to/file1.txt": "file1 contents...",
+  "file:///path/to/file2.txt": "file2 contents...",
+}
+```
+
+**Synchronization modes:**
+- **Full (mode=1)**: Client sends entire document on each change
+- **Incremental (mode=2)**: Client sends only changed portions (not implemented)
+
+This server uses **full synchronization** for simplicity.
+
+## 📊 LSP Specification Compliance
+
+This implementation follows the [Language Server Protocol Specification v3.17](https://microsoft.github.io/language-server-protocol/) and implements the following subset:
+
+### Lifecycle Messages
+
+| Message | Type | Status | Description |
+|---------|------|--------|-------------|
+| `initialize` | Request | ✅ Implemented | Negotiate capabilities between client and server |
+| `initialized` | Notification | ✅ Implemented | Confirm initialization complete |
+| `shutdown` | Request | ✅ Implemented | Prepare for graceful shutdown |
+| `exit` | Notification | ✅ Implemented | Terminate server process |
+
+### Document Synchronization
+
+| Message | Type | Status | Description |
+|---------|------|--------|-------------|
+| `textDocument/didOpen` | Notification | ✅ Implemented | Document opened in editor |
+| `textDocument/didChange` | Notification | ✅ Implemented | Document content changed |
+| `textDocument/didClose` | Notification | ✅ Implemented | Document closed in editor |
+| `textDocument/didSave` | Notification | ⚠️ Received but no-op | Document saved (no special handling) |
+
+### Diagnostics
+
+| Message | Type | Status | Description |
+|---------|------|--------|-------------|
+| `textDocument/publishDiagnostics` | Notification | ✅ Implemented | Server pushes diagnostics to client |
+
+### Server Capabilities
+
+Advertised in the `initialize` response:
 
 ```json
 {
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "textDocument/hover",
-  "params": {
-    "textDocument": {
-      "uri": "file:///home/user/project/main.go"
+  "capabilities": {
+    "textDocumentSync": {
+      "openClose": true,
+      "change": 1,
+      "save": {
+        "includeText": false
+      }
     },
-    "position": {
-      "line": 2,
-      "character": 5
+    "diagnosticProvider": {
+      "interFileDependencies": false,
+      "workspaceDiagnostics": false
     }
   }
 }
 ```
 
-#### 5. Hover Response (Server → Client)
+**Text Document Sync Mode:**
+- `0` = None
+- `1` = Full (entire document sent on change) ← **We use this**
+- `2` = Incremental (only changes sent)
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "result": {
-    "contents": {
-      "kind": "markdown",
-      "value": "**main**\n\nThe main function is the entry point of the program."
-    }
-  }
-}
-```
+### Not Yet Implemented
 
-## Configuration
+These are common LSP features not included in this basic implementation:
 
-### Server Configuration Options
+| Feature | Message |
+|---------|---------|
+| Code Completion | `textDocument/completion` |
+| Hover Information | `textDocument/hover` |
+| Go to Definition | `textDocument/definition` |
+| Find References | `textDocument/references` |
+| Document Symbols | `textDocument/documentSymbol` |
+| Code Formatting | `textDocument/formatting` |
+| Code Actions | `textDocument/codeAction` |
+| Rename | `textDocument/rename` |
+| Workspace Symbols | `workspace/symbol` |
 
-The server can be configured via initialization parameters. Common options include:
-
-- **Root URI**: The workspace root directory
-- **Initialization Options**: Custom server-specific settings
-- **Client Capabilities**: Features supported by the client
-
-### Environment Variables
-
-- `LSP_LOG_LEVEL`: Set logging level (debug, info, warn, error)
-- `LSP_LOG_FILE`: Path to log file (default: stderr)
-
-Example:
-```bash
-export LSP_LOG_LEVEL=debug
-export LSP_LOG_FILE=/tmp/lsp-server.log
-./lsp-server
-```
-
-## Architecture
+## 🛠️ Development Guide
 
 ### Project Structure
 
 ```
 lsp-server/
-├── main.go                     # Entry point and server initialization
-├── server/
-│   └── server.go              # Core LSP server and request routing
-├── document/
-│   ├── manager.go             # Document state management
-│   └── manager_test.go        # Document manager tests
-├── handlers/
-│   ├── handlers.go            # LSP feature implementations
-│   ├── symbol_index.go        # Symbol indexing for fast lookups
-│   └── *_test.go              # Handler tests
+├── server.py           # Main LSP server implementation
+├── test_client.py      # Test client for validation
+├── requirements.txt    # Empty (no dependencies!)
+├── pyproject.toml      # Python project metadata
+├── setup.py            # Setup script
+├── run_test.sh         # Automated test runner
+├── README.md           # This file
+├── QUICKSTART.md       # Quick start guide
 ├── examples/
-│   ├── README.md              # Examples documentation
-│   └── sample.go              # Sample code for testing
-├── go.mod                     # Go module dependencies
-├── Makefile                   # Build and test automation
-└── README.md                  # This file
+│   ├── test.txt       # Sample file with various issues
+│   └── code_sample.py # Python code example
+└── .gitignore
+
+Total: ~600 lines of Python code
 ```
 
-### Key Components
+### Adding Custom Diagnostics
 
-#### Server
-The core server manages JSON-RPC 2.0 communication between the client and server. It:
-- Reads messages from stdin with proper header parsing
-- Routes requests to appropriate handlers
-- Sends responses back via stdout
-- Manages server lifecycle and state
+Extend the analysis engine by modifying `analyze_document()` in `server.py`:
 
-#### Document Manager
-Maintains the state of all open documents with thread-safe access:
-- Stores document content and version information
-- Provides atomic read/write operations using `sync.RWMutex`
-- Tracks document metadata (URI, language ID, version)
-
-#### Handlers
-Implements LSP features:
-- **Lifecycle handlers**: Initialize, shutdown, exit
-- **Text sync handlers**: didOpen, didChange, didClose, didSave
-- **Feature handlers**: Hover, definition, references, completion, symbols
-
-#### Symbol Index
-Fast symbol lookup across the workspace:
-- Indexes symbols from all open documents
-- Provides efficient search capabilities
-- Updates incrementally as documents change
-
-### Communication Flow
-
-```
-┌─────────────┐                                    ┌─────────────┐
-│   Editor    │                                    │ LSP Server  │
-│  (Client)   │                                    │             │
-└──────┬──────┘                                    └──────┬──────┘
-       │                                                  │
-       │  1. Initialize Request                          │
-       │ ─────────────────────────────────────────────> │
-       │                                                  │
-       │  2. Initialize Response (Capabilities)          │
-       │ <───────────────────────────────────────────── │
-       │                                                  │
-       │  3. Initialized Notification                    │
-       │ ─────────────────────────────────────────────> │
-       │                                                  │
-       │  4. textDocument/didOpen                        │
-       │ ─────────────────────────────────────────────> │
-       │                                                  │
-       │  5. textDocument/hover                          │
-       │ ─────────────────────────────────────────────> │
-       │                                                  │
-       │  6. Hover Response                              │
-       │ <───────────────────────────────────────────── │
-       │                                                  │
-       │  7. textDocument/didChange                      │
-       │ ─────────────────────────────────────────────> │
-       │                                                  │
-       │  8. textDocument/publishDiagnostics            │
-       │ <───────────────────────────────────────────── │
-       │                                                  │
+**Example 1: Detect Hardcoded Credentials**
+```python
+# Add to analyze_document() method
+match = re.search(r'password\s*=\s*["\'][\w]+["\']', line, re.IGNORECASE)
+if match:
+    diagnostics.append({
+        "range": {
+            "start": {"line": line_num, "character": match.start()},
+            "end": {"line": line_num, "character": match.end()}
+        },
+        "message": "Hardcoded password detected - use environment variables",
+        "severity": 1,  # Error
+        "source": "basic-lsp-server"
+    })
 ```
 
-### Message Format
-
-LSP uses a header-based message format over stdin/stdout:
-
-```
-Content-Length: <number-of-bytes>\r\n
-\r\n
-<json-rpc-content>
-```
-
-Example:
-```
-Content-Length: 124\r\n
-\r\n
-{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":1234,"rootUri":"file:///path","capabilities":{}}}
+**Example 2: Detect Trailing Whitespace**
+```python
+if line.endswith(' ') or line.endswith('\t'):
+    diagnostics.append({
+        "range": {
+            "start": {"line": line_num, "character": len(line.rstrip())},
+            "end": {"line": line_num, "character": len(line)}
+        },
+        "message": "Trailing whitespace",
+        "severity": 3,  # Info
+        "source": "basic-lsp-server"
+    })
 ```
 
-## Contributing
+**Example 3: Detect Missing Documentation**
+```python
+# Check for function definitions without docstrings
+if re.match(r'^\s*def\s+\w+\(', line):
+    # Check if next line is a docstring
+    if line_num + 1 < len(lines):
+        next_line = lines[line_num + 1].strip()
+        if not next_line.startswith('"""') and not next_line.startswith("'''"):
+            diagnostics.append({
+                "range": {
+                    "start": {"line": line_num, "character": 0},
+                    "end": {"line": line_num, "character": len(line)}
+                },
+                "message": "Function missing docstring",
+                "severity": 3,  # Info
+                "source": "basic-lsp-server"
+            })
+```
 
-We welcome contributions! Here's how you can help:
+### Diagnostic Severity Levels
 
-### Getting Started
+| Severity | Value | Color (typical) | Use Case |
+|----------|-------|-----------------|----------|
+| Error | `1` | 🔴 Red | Syntax errors, critical issues |
+| Warning | `2` | 🟡 Yellow | Style violations, code smells |
+| Information | `3` | 🔵 Blue | Suggestions, TODOs |
+| Hint | `4` | ⚪ Gray | Minor improvements, optimizations |
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork**:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/lsp-server.git
-   cd lsp-server
-   ```
-3. **Create a feature branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. **Make your changes** and commit them:
-   ```bash
-   git commit -am "Add new feature"
-   ```
-5. **Push to your fork**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-6. **Open a Pull Request** on GitHub
+### Adding New LSP Features
 
-### Development Guidelines
+**Step 1: Add Handler Method**
+```python
+def handle_text_document_hover(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle textDocument/hover request."""
+    uri = params["textDocument"]["uri"]
+    position = params["position"]
+    line_num = position["line"]
+    
+    # Get document content
+    if uri not in self.documents:
+        return {"contents": ""}
+    
+    text = self.documents[uri]
+    lines = text.split('\n')
+    
+    if line_num < len(lines):
+        line = lines[line_num]
+        return {
+            "contents": {
+                "kind": "markdown",
+                "value": f"**Line {line_num + 1}**: `{line.strip()}`"
+            }
+        }
+    
+    return {"contents": ""}
+```
 
-#### Code Style
-- Follow Go best practices and conventions
-- Use `gofmt` and `golint` for code formatting
-- Write clear, self-documenting code with meaningful variable names
-- Add comments for complex logic or non-obvious behavior
+**Step 2: Register Handler**
+```python
+def handle_request(self, request_id: Any, method: str, params: Dict[str, Any]) -> None:
+    handlers = {
+        "initialize": self.handle_initialize,
+        "shutdown": self.handle_shutdown,
+        "textDocument/hover": self.handle_text_document_hover,  # ← Add here
+    }
+    # ... rest of method
+```
 
-#### Testing
-- Write unit tests for new features
-- Ensure all tests pass: `go test ./...`
-- Aim for high test coverage
-- Include both positive and negative test cases
+**Step 3: Update Server Capabilities**
+```python
+def handle_initialize(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "capabilities": {
+            "textDocumentSync": {...},
+            "diagnosticProvider": {...},
+            "hoverProvider": True,  # ← Add capability
+        },
+        # ...
+    }
+```
 
-#### Thread Safety
-- Use proper synchronization primitives (`sync.Mutex`, `sync.RWMutex`)
-- Avoid data races (test with `go test -race`)
-- Document thread-safety guarantees
+### Testing Your Changes
 
-#### Error Handling
-- Handle all errors explicitly
-- Provide meaningful error messages
-- Log errors with appropriate context
-- Return proper JSON-RPC error responses
-
-#### Documentation
-- Update README.md for new features
-- Add godoc comments for exported functions
-- Include examples where appropriate
-- Update CHANGELOG.md
-
-### Running Tests
-
+**1. Unit Test with Test Client**
 ```bash
-# Run all tests
-go test ./...
+# Create a test file
+echo "TODO: Test hover functionality" > test_hover.txt
 
-# Run tests with coverage
-go test -cover ./...
+# Run test client
+python3 test_client.py test_hover.txt
 
-# Run tests with race detector
-go test -race ./...
-
-# Run specific test
-go test -v -run TestFunctionName ./package
+# Check logs for debugging
+tail -f /tmp/lsp-server.log
 ```
 
-### Building and Testing Locally
-
+**2. Integration Test with Editor**
 ```bash
-# Install dependencies
-go mod download
+# Start Neovim with custom config
+nvim -u custom_lsp_config.lua test_file.txt
 
-# Build
-go build -o lsp-server .
-
-# Run
-./lsp-server
-
-# Format code
-gofmt -s -w .
-
-# Run linter
-golangci-lint run
+# Or VS Code
+code --disable-extensions --add "path/to/lsp-extension"
 ```
 
-### Pull Request Checklist
+**3. Manual Protocol Testing**
+```bash
+# Send raw JSON-RPC messages
+echo -e 'Content-Length: 52\r\n\r\n{"jsonrpc":"2.0","id":1,"method":"initialize"}' | python3 server.py
+```
 
-Before submitting a PR, ensure:
-- [ ] Code follows Go conventions
-- [ ] All tests pass
-- [ ] New features have tests
-- [ ] Documentation is updated
-- [ ] Commit messages are clear and descriptive
-- [ ] No unnecessary dependencies added
-- [ ] Code is properly formatted
+### Logging and Debugging
 
-## License
+**Log Location:** `/tmp/lsp-server.log`
 
-This project is licensed under the MIT License. This means you are free to:
-- Use the software commercially
-- Modify the source code
-- Distribute the software
-- Use it privately
+**Monitor logs in real-time:**
+```bash
+tail -f /tmp/lsp-server.log
+```
 
-See the [LICENSE](LICENSE) file for the full license text.
+**Log levels:**
+- `INFO`: Normal operation messages
+- `WARNING`: Unexpected but handled situations
+- `ERROR`: Exceptions and failures
 
-## Support and Contact
+**Add custom logging:**
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+logger.info(f"Processing document: {uri}")
+logger.warning(f"Unknown method: {method}")
+logger.error(f"Failed to parse: {e}", exc_info=True)
+```
+
+### Performance Considerations
+
+**Current Implementation:**
+- ✅ Single-threaded: Simple, predictable
+- ✅ Synchronous I/O: Easy to debug
+- ❌ Blocks on slow operations: Not suitable for large files
+- ❌ Full document sync: Inefficient for large files
+
+**Production Improvements:**
+
+1. **Async I/O**
+```python
+import asyncio
+
+async def read_message(self):
+    # Non-blocking message reading
+    pass
+
+async def handle_request(self, ...):
+    # Concurrent request handling
+    pass
+```
+
+2. **Incremental Sync**
+```python
+def handle_text_document_did_change(self, params):
+    # Apply only changed portions
+    for change in content_changes:
+        start = change["range"]["start"]
+        end = change["range"]["end"]
+        # Update only affected range
+```
+
+3. **Background Analysis**
+```python
+import threading
+
+def analyze_in_background(self, uri, text):
+    thread = threading.Thread(
+        target=self._analyze_and_publish,
+        args=(uri, text)
+    )
+    thread.start()
+```
+
+4. **Caching**
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=100)
+def analyze_document(self, text: str):
+    # Cache results for unchanged documents
+    pass
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues and Solutions
+
+#### Server Not Responding
+
+**Symptoms:**
+- Editor shows "LSP server disconnected"
+- No diagnostics appear
+- Hanging on initialization
+
+**Solutions:**
+```bash
+# 1. Check if server is running
+ps aux | grep server.py
+
+# 2. Check logs for errors
+tail -f /tmp/lsp-server.log
+
+# 3. Verify Python version
+python3 --version  # Must be 3.8+
+
+# 4. Test server manually
+echo 'Content-Length: 52\r\n\r\n{"jsonrpc":"2.0","id":1,"method":"initialize"}' | python3 server.py
+
+# 5. Restart editor and try again
+```
+
+#### Diagnostics Not Appearing
+
+**Symptoms:**
+- Server connects but no issues shown
+- File opens but analysis doesn't run
+
+**Solutions:**
+```bash
+# 1. Verify file was opened correctly
+grep "Document opened" /tmp/lsp-server.log
+
+# 2. Check file URI format
+# Correct: file:///absolute/path/to/file.txt
+# Wrong: /relative/path/file.txt
+
+# 3. Ensure file has detectable issues
+echo "TODO: test issue" > test.txt
+python3 test_client.py test.txt
+
+# 4. Check editor LSP client configuration
+# Some editors require explicit diagnostics request
+```
+
+#### Connection Refused / Initialization Failed
+
+**Symptoms:**
+- "Failed to start language server"
+- "Connection closed by server"
+
+**Solutions:**
+```python
+# 1. Check for port conflicts (if using TCP)
+# Not applicable for this stdio-based server
+
+# 2. Verify server path in editor config
+# Must be absolute path: /absolute/path/to/server.py
+
+# 3. Check file permissions
+chmod +x server.py
+
+# 4. Test with minimal client
+python3 test_client.py examples/test.txt
+```
+
+#### Performance Issues
+
+**Symptoms:**
+- Slow typing response
+- Editor freezing
+- High CPU usage
+
+**Solutions:**
+```python
+# 1. Check file size
+ls -lh your-file.txt
+# Files > 1MB may cause slowness
+
+# 2. Reduce analysis frequency
+# Modify handle_text_document_did_change to debounce:
+
+import time
+
+class LSPServer:
+    def __init__(self):
+        self.last_analysis_time = {}
+        self.debounce_delay = 0.5  # seconds
+    
+    def handle_text_document_did_change(self, params):
+        uri = params["textDocument"]["uri"]
+        current_time = time.time()
+        
+        # Skip if analyzed recently
+        if uri in self.last_analysis_time:
+            if current_time - self.last_analysis_time[uri] < self.debounce_delay:
+                return
+        
+        # ... rest of method
+        self.last_analysis_time[uri] = current_time
+
+# 3. Disable server for large files temporarily
+```
+
+#### Invalid JSON-RPC Messages
+
+**Symptoms:**
+- "Error parsing message"
+- Server crashes on startup
+
+**Solutions:**
+```bash
+# 1. Check message format
+# Must have Content-Length header and proper JSON
+
+# 2. Verify editor sends correct format
+# Enable verbose logging in editor
+
+# 3. Test with known-good client
+python3 test_client.py examples/test.txt
+
+# 4. Check for encoding issues
+file -i server.py  # Should be utf-8
+```
+
+#### Editor-Specific Issues
+
+**VS Code:**
+```json
+// Check output panel: View → Output → Select "LSP server"
+// Enable trace logging:
+{
+  "lsp.trace.server": "verbose"
+}
+```
+
+**Neovim:**
+```lua
+-- Check LSP logs
+:lua vim.cmd('e ' .. vim.lsp.get_log_path())
+
+-- Restart LSP client
+:LspRestart
+
+-- Check client status
+:LspInfo
+```
+
+**Emacs:**
+```elisp
+;; Check *lsp-log* buffer
+(switch-to-buffer "*lsp-log*")
+
+;; Restart LSP
+M-x lsp-workspace-restart
+
+;; Enable debug mode
+(setq lsp-log-io t)
+```
+
+### Debug Checklist
+
+Before reporting issues, verify:
+
+- [ ] Python 3.8+ installed: `python3 --version`
+- [ ] Server file is executable: `chmod +x server.py`
+- [ ] Server runs manually: `python3 server.py`
+- [ ] Test client works: `python3 test_client.py examples/test.txt`
+- [ ] Log file exists: `ls -l /tmp/lsp-server.log`
+- [ ] No errors in logs: `tail -20 /tmp/lsp-server.log`
+- [ ] Editor LSP client installed and configured
+- [ ] Absolute paths used in editor configuration
+- [ ] File URI format is correct
 
 ### Getting Help
 
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/rkkeerth/lsp-server/issues)
-- **Discussions**: Ask questions in [GitHub Discussions](https://github.com/rkkeerth/lsp-server/discussions)
-- **Documentation**: Check the [LSP Specification](https://microsoft.github.io/language-server-protocol/)
+If issues persist:
 
-### Reporting Bugs
-
-When reporting bugs, please include:
-- Go version: `go version`
-- Operating system and version
-- Steps to reproduce the issue
-- Expected vs actual behavior
-- Relevant log output (from stderr)
-- Minimal code example if applicable
-
-### Feature Requests
-
-We welcome feature requests! Please:
-- Check if the feature already exists or is planned
-- Describe the use case and benefits
-- Provide examples of how it would work
-- Consider if it aligns with the LSP specification
-
-## Resources
-
-### LSP Documentation
-- [Language Server Protocol Specification](https://microsoft.github.io/language-server-protocol/)
-- [LSP Overview](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/)
-- [JSON-RPC 2.0 Specification](https://www.jsonrpc.org/specification)
-
-### Go LSP Libraries
-- [go.lsp.dev/protocol](https://pkg.go.dev/go.lsp.dev/protocol) - LSP protocol types
-- [go.lsp.dev/jsonrpc2](https://pkg.go.dev/go.lsp.dev/jsonrpc2) - JSON-RPC implementation
-
-### Editor Integration Guides
-- [VS Code LSP Extension Guide](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide)
-- [Neovim LSP Documentation](https://neovim.io/doc/user/lsp.html)
-- [Emacs lsp-mode](https://emacs-lsp.github.io/lsp-mode/)
-
-## Troubleshooting
-
-### Common Issues
-
-#### Server Not Starting
-**Problem**: Server doesn't start or exits immediately
-
-**Solutions**:
-- Verify Go installation: `go version` (requires 1.21+)
-- Check build was successful: `ls -l lsp-server`
-- Ensure executable permissions: `chmod +x lsp-server`
-- Review stderr logs for initialization errors
-
-#### Connection Issues
-**Problem**: Editor cannot connect to server
-
-**Solutions**:
-- Verify server path in editor configuration
-- Check that server is using stdin/stdout (not TCP)
-- Review editor's LSP client logs
-- Ensure no other process is interfering with stdin/stdout
-
-#### Features Not Working
-**Problem**: Hover, completion, or other features don't work
-
-**Solutions**:
-- Check server capabilities in initialize response
-- Ensure document was opened with `textDocument/didOpen`
-- Review server logs for errors
-- Verify editor supports the LSP feature
-- Check that the cursor position is valid
-
-#### Performance Issues
-**Problem**: Server is slow or uses too much memory
-
-**Solutions**:
-- Check for large files causing indexing delays
-- Review log level (debug logging is verbose)
-- Monitor goroutine count and memory usage
-- Consider incremental document sync for large files
-
-#### Diagnostic Output
-
+1. **Collect diagnostic information:**
 ```bash
-# Enable debug logging
-export LSP_LOG_LEVEL=debug
-./lsp-server 2> debug.log
+# System info
+python3 --version
+uname -a
 
-# Check server output
-tail -f debug.log
+# Server logs
+tail -50 /tmp/lsp-server.log
 
-# Test server manually
-echo 'Content-Length: 124\r\n\r\n{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"processId":1234}}' | ./lsp-server
+# Test client output
+python3 test_client.py examples/test.txt 2>&1 | tee debug.log
 ```
 
-## Roadmap
+2. **Create minimal reproduction:**
+```bash
+# Smallest file that reproduces the issue
+echo "TODO: test" > minimal.txt
+python3 test_client.py minimal.txt
+```
 
-### Current Version (1.0.0)
-- ✅ Full LSP lifecycle support
-- ✅ Text document synchronization
-- ✅ Hover information
-- ✅ Go to definition
-- ✅ Find references
-- ✅ Document and workspace symbols
-- ✅ Code completion
-- ✅ Basic diagnostics
+3. **Check GitHub issues**: Search for similar problems
+4. **Provide context**: Editor, OS, Python version, exact error messages
 
-### Planned Features
+## 🤝 Contributing
 
-#### Version 1.1
-- [ ] Incremental document synchronization
-- [ ] Improved diagnostics with quickfixes
-- [ ] Code formatting support
-- [ ] Enhanced symbol resolution
+Contributions are welcome! This project aims to remain simple and educational.
 
-#### Version 1.2
-- [ ] Signature help
-- [ ] Rename refactoring
-- [ ] Code actions and quick fixes
-- [ ] Document links
+### Contribution Guidelines
 
-#### Version 2.0
-- [ ] Semantic highlighting
-- [ ] Call hierarchy
-- [ ] Type hierarchy
-- [ ] Inline values
-- [ ] Advanced refactoring operations
+**Good Contributions:**
+- Bug fixes with test cases
+- Documentation improvements
+- New diagnostic rules with examples
+- Editor integration guides
+- Performance optimizations
 
-### Contributing to the Roadmap
+**Please Avoid:**
+- Adding external dependencies
+- Overcomplicating the codebase
+- Implementing advanced features that obscure learning
+- Breaking changes to the API
 
-Have ideas for new features? We'd love to hear them! Please:
-1. Check existing issues and discussions
-2. Open a feature request with detailed use cases
-3. Consider contributing the implementation
-4. Participate in design discussions
+### Development Setup
 
-## Acknowledgments
+```bash
+# Clone repository
+git clone https://github.com/rkkeerth/lsp-server.git
+cd lsp-server
 
-This project is built with excellent open-source libraries:
-- [go.lsp.dev](https://go.lsp.dev/) - LSP protocol types and JSON-RPC implementation
-- [Zap](https://github.com/uber-go/zap) - Blazing fast structured logging
-- The Go team for an excellent programming language and tooling
+# Create feature branch
+git checkout -b feature/your-feature-name
 
-Special thanks to:
-- Microsoft for creating and maintaining the LSP specification
-- The LSP community for comprehensive documentation and examples
-- All contributors and users of this project
+# Make changes
+vim server.py
+
+# Test changes
+python3 test_client.py examples/test.txt
+
+# Check logs
+tail -f /tmp/lsp-server.log
+
+# Commit with clear message
+git commit -m "Add: Detection for hardcoded credentials"
+
+# Push and create pull request
+git push origin feature/your-feature-name
+```
+
+### Testing Your Contributions
+
+```bash
+# 1. Run with test client
+python3 test_client.py examples/test.txt
+
+# 2. Test with multiple files
+for file in examples/*.txt; do
+    python3 test_client.py "$file"
+done
+
+# 3. Test with real editor
+nvim test.txt  # With LSP configured
+
+# 4. Check for regressions
+diff <(python3 test_client.py examples/test.txt 2>&1) expected_output.txt
+```
+
+## 📄 License
+
+This is a demonstration implementation for educational purposes. Feel free to use, modify, and distribute.
+
+**MIT License** - See repository for full license text.
+
+## 🙏 Acknowledgments
+
+- **Microsoft**: For creating and maintaining the LSP specification
+- **LSP Community**: For excellent documentation and examples
+- **Contributors**: Everyone who has improved this project
+
+## 📚 Additional Resources
+
+### Files in This Repository
+
+- **`server.py`**: Main LSP server implementation (~300 lines)
+- **`test_client.py`**: Test client for validation (~200 lines)
+- **`examples/test.txt`**: Sample file demonstrating all diagnostic rules
+- **`examples/code_sample.py`**: Python code example
+- **`QUICKSTART.md`**: 2-minute getting started guide
+- **`run_test.sh`**: Automated test script
+
+### Quick Reference Card
+
+```bash
+# Start server manually
+python3 server.py
+
+# Test with client
+python3 test_client.py <file>
+
+# Monitor logs
+tail -f /tmp/lsp-server.log
+
+# Quick test
+./run_test.sh
+
+# Integration test
+nvim test.txt  # Or your editor of choice
+```
+
+### Server Capabilities Summary
+
+| Capability | Supported | Notes |
+|------------|-----------|-------|
+| Initialize/Shutdown | ✅ | Full lifecycle management |
+| Document Sync | ✅ | Full sync mode only |
+| Diagnostics | ✅ | 4 types of checks |
+| Hover | ❌ | Not implemented |
+| Completion | ❌ | Not implemented |
+| Go to Definition | ❌ | Not implemented |
+| Find References | ❌ | Not implemented |
+| Formatting | ❌ | Not implemented |
+| Code Actions | ❌ | Not implemented |
 
 ---
 
-**Author**: [rkkeerth](https://github.com/rkkeerth)  
-**Repository**: [github.com/rkkeerth/lsp-server](https://github.com/rkkeerth/lsp-server)  
-**Version**: 1.0.0  
-**License**: MIT
+**Questions? Issues? Contributions?**
+
+Open an issue or pull request on [GitHub](https://github.com/rkkeerth/lsp-server)
+
+Happy coding! 🚀
