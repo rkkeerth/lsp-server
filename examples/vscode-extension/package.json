@@ -1,0 +1,40 @@
+{
+  "name": "example-lsp-client",
+  "displayName": "Example LSP Client",
+  "description": "VS Code client for the example LSP server",
+  "version": "0.1.0",
+  "publisher": "example",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": ["Programming Languages"],
+  "activationEvents": [
+    "onLanguage:plaintext"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Example LSP",
+      "properties": {
+        "exampleLsp.serverPath": {
+          "type": "string",
+          "default": "lsp-server",
+          "description": "Path to the LSP server executable"
+        },
+        "exampleLsp.trace.server": {
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0"
+  }
+}
