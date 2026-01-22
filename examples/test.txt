@@ -1,0 +1,51 @@
+// Example file to test LSP server features
+
+// Test 1: Hover over keywords
+// Try hovering over: function, var, const, for, if, return
+
+function calculateSum(a, b) {
+    return a + b
+}
+
+function processData() {
+    var count = 0
+    const MAX_VALUE = 100
+    
+    for (i = 0; i < MAX_VALUE; i++) {
+        if (i % 2 == 0) {
+            count = count + 1
+        }
+    }
+    
+    return count
+}
+
+// Test 2: Code completion
+// Type these prefixes and wait for completions:
+// - "fun"  -> should suggest "function"
+// - "va"   -> should suggest "var"
+// - "co"   -> should suggest "const"
+// - "fo"   -> should suggest "for"
+// - "i"    -> should suggest "if"
+
+// Test 3: Go-to-definition
+// Place cursor on these and trigger go-to-definition:
+// - calculateSum (should jump to line 5)
+// - processData (should jump to line 9)
+// - MAX_VALUE (should jump to line 11)
+
+const API_ENDPOINT = "https://api.example.com"
+var globalCounter = 0
+
+function initializeApp() {
+    var config = {
+        endpoint: API_ENDPOINT,
+        timeout: 5000
+    }
+    return config
+}
+
+// Test 4: Multiple definitions
+// These should show multiple definition locations when you search:
+var data = []
+var data = "test"
