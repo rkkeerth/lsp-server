@@ -1,6 +1,6 @@
 # LSP Server
 
-A boilerplate Language Server Protocol (LSP) server written in Go using only the standard library.
+A boilerplate Language Server Protocol (LSP) server written in Python using only the standard library.
 
 ## Features
 
@@ -8,15 +8,17 @@ A boilerplate Language Server Protocol (LSP) server written in Go using only the
 - Full text document synchronization
 - Core LSP lifecycle methods
 
-## Building
+## Requirements
 
-```bash
-go build -o lsp-server .
-```
+Python 3.11+ (standard library only, no dependencies)
 
 ## Usage
 
 The server communicates over stdin/stdout using the LSP protocol. It is designed to be launched by an editor or IDE that supports the Language Server Protocol.
+
+```bash
+python3 main.py
+```
 
 ### Example: VS Code Configuration
 
@@ -24,7 +26,7 @@ Create a file at `.vscode/settings.json` in your project:
 
 ```json
 {
-  "lsp-server.path": "/path/to/lsp-server"
+  "lsp-server.command": ["python3", "/path/to/main.py"]
 }
 ```
 
@@ -35,10 +37,10 @@ Or configure it in an extension's `package.json`:
   "contributes": {
     "configuration": {
       "properties": {
-        "lsp-server.path": {
-          "type": "string",
-          "default": "lsp-server",
-          "description": "Path to the LSP server executable"
+        "lsp-server.command": {
+          "type": "array",
+          "default": ["python3", "main.py"],
+          "description": "Command to start the LSP server"
         }
       }
     }
@@ -56,7 +58,7 @@ local configs = require('lspconfig.configs')
 
 configs.lsp_server = {
   default_config = {
-    cmd = { '/path/to/lsp-server' },
+    cmd = { 'python3', '/path/to/main.py' },
     filetypes = { 'your-language' },
     root_dir = lspconfig.util.root_pattern('.git'),
   },
@@ -106,18 +108,24 @@ The server advertises the following capabilities:
 
 ```
 lsp-server/
-├── main.go           # Entry point
-├── go.mod            # Go module definition
-├── jsonrpc/
-│   ├── types.go      # JSON-RPC 2.0 types
-│   └── transport.go  # stdin/stdout transport
-├── protocol/
-│   ├── types.go      # LSP protocol types
-│   └── methods.go    # LSP method constants
-├── document/
-│   └── manager.go    # Document state management
-└── server/
-    └── server.go     # Server implementation
+├── main.py              # Entry point
+├── lsp_server/
+│   ├── __init__.py
+│   ├── jsonrpc/
+│   │   ├── __init__.py
+│   │   ├── types.py     # JSON-RPC 2.0 types
+│   │   └── transport.py # stdin/stdout transport
+│   ├── protocol/
+│   │   ├── __init__.py
+│   │   ├── types.py     # LSP protocol types
+│   │   └── methods.py   # LSP method constants
+│   ├── document/
+│   │   ├── __init__.py
+│   │   └── manager.py   # Document state management
+│   └── server/
+│       ├── __init__.py
+│       └── server.py    # Server implementation
+└── tests/               # Test suite
 ```
 
 ## License

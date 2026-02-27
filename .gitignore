@@ -1,2 +1,18 @@
-# Binary
-lsp-server
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Type checking
+.mypy_cache/
+
+# Testing
+.pytest_cache/
+
+# Linting
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
