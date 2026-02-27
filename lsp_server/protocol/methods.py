@@ -1,0 +1,11 @@
+"""LSP method name constants."""
+
+METHOD_INITIALIZE = "initialize"
+METHOD_INITIALIZED = "initialized"
+METHOD_SHUTDOWN = "shutdown"
+METHOD_EXIT = "exit"
+METHOD_DID_OPEN = "textDocument/didOpen"
+METHOD_DID_CHANGE = "textDocument/didChange"
+METHOD_DID_CLOSE = "textDocument/didClose"
+METHOD_DID_SAVE = "textDocument/didSave"
+METHOD_PUBLISH_DIAGNOSTICS = "textDocument/publishDiagnostics"
